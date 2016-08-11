@@ -1,13 +1,22 @@
 import Rx from 'rxjs'
 
 // Logic (functional)
-function main() {
+function main(DOMSource) {
+  const click$ = DOMSource;
   return {
-    DOM: Rx.Observable.timer(0, 1000)
-      .map(i => `Seconds elapsed ${i}`),
+    DOM: click$
+      .startWith(null)
+      //.flatMapLatest(() =>
+      .switchMap(() =>
+        Rx.Observable.timer(0, 1000)
+          .map(i => `Seconds elapsed ${i}`)
+      ),
     Log: Rx.Observable.timer(0, 2000).map(i => 2 * i),
   };
 }
+
+// source: input (read) effects
+// sink: output (write) effects
 
 // Effects (imperative)
 function DOMDriver(text$) {
@@ -15,17 +24,28 @@ function DOMDriver(text$) {
     const container = document.querySelector('#app');
     container.textContent = text;
   });
+  const DOMSource = Rx.Observable.fromEvent(document, 'click');
+  return DOMSource;
 }
 
 function consoleLogDriver(msg$) {
   msg$.subscribe(msg => console.log(msg));
 }
 
+// bProxy = ...
+// a = f(bProxy)
+// b = g(a)
+// bProxy.imitate(b)
+
 function run(mainFn, drivers) {
-  const sinks = mainFn();
-  Object.keys(drivers).forEach(key => {
-    drivers[key](sinks[key]);
-  });
+  const proxyDOMSource = new Rx.Subject();
+  const sinks = mainFn(proxyDOMSource);
+  const DOMSource = drivers.DOM(sinks.DOM);
+  // DOMSource.subscribe(click => proxyDOMSource.onNext(click));
+  DOMSource.subscribe(click => proxyDOMSource.next(click));
+  // Object.keys(drivers).forEach(key => {
+  //   drivers[key](sinks[key]);
+  // });
 }
 
 const drivers = {
@@ -34,4 +54,3 @@ const drivers = {
 };
 
 run(main, drivers);
-
