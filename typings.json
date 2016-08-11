@@ -1,0 +1,10 @@
+{
+  "dependencies": {
+    "xstream": "file:node_modules/xstream/core.d.ts",
+    "@cycle/dom": "file:node_modules/@cycle/dom/lib/index.d.ts",
+    "@cycle/xstream-run": "file:node_modules/@cycle/xstream-run/lib/index.d.ts"
+  },
+  "globalDependencies": {
+    "rx": "registry:dt/rx#0.0.0+20160317120654"
+  }
+}
