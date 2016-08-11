@@ -1,8 +1,6 @@
 import Rx from 'rx'
 import {run} from '@cycle/rx-run'
-import CycleDOM from '@cycle/dom'
-
-const {h, h1, span, makeDOMDriver} = CycleDOM;
+import {h1, span, makeDOMDriver} from '@cycle/dom'
 
 // Logic (functional)
 function main(sources) {
@@ -20,7 +18,7 @@ function main(sources) {
             ])
           )
       ),
-    Log: Rx.Observable.timer(0, 2000).map(i => 2*i),
+    Log: Rx.Observable.timer(0, 2000).map(i => 2 * i),
   };
   return sinks;
 }
