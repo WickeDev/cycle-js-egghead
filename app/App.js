@@ -1,9 +1,10 @@
 import Rx from 'rxjs'
+import {run} from '@cycle/rx-run'
 
 // Logic (functional)
-function main(DOMSource) {
-  const click$ = DOMSource;
-  return {
+function main(source) {
+  const click$ = source.DOM;
+  const sinks = {
     DOM: click$
       .startWith(null)
       //.flatMapLatest(() =>
@@ -13,7 +14,9 @@ function main(DOMSource) {
       ),
     Log: Rx.Observable.timer(0, 2000).map(i => 2 * i),
   };
+  return sinks;
 }
+
 
 // source: input (read) effects
 // sink: output (write) effects
@@ -37,16 +40,17 @@ function consoleLogDriver(msg$) {
 // b = g(a)
 // bProxy.imitate(b)
 
-function run(mainFn, drivers) {
-  const proxyDOMSource = new Rx.Subject();
-  const sinks = mainFn(proxyDOMSource);
-  const DOMSource = drivers.DOM(sinks.DOM);
-  // DOMSource.subscribe(click => proxyDOMSource.onNext(click));
-  DOMSource.subscribe(click => proxyDOMSource.next(click));
-  // Object.keys(drivers).forEach(key => {
-  //   drivers[key](sinks[key]);
-  // });
-}
+/*function run(mainFn, drivers) {
+  const proxySources = {};
+  Object.keys(drivers).forEach(key => {
+    proxySources[key] = new Rx.Subject();
+  });
+  const sinks = mainFn(proxySources);
+  Object.keys(drivers).forEach(key => {
+    const source = drivers[key](sinks[key]);
+    source.subscribe(x => proxySources[key].next(x));
+  })
+}*/
 
 const drivers = {
   DOM: DOMDriver,
