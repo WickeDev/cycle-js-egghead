@@ -1,7 +1,6 @@
 {
   "dependencies": {
     "xstream": "file:node_modules/xstream/core.d.ts",
-    "@cycle/dom": "file:node_modules/@cycle/dom/lib/index.d.ts",
     "@cycle/xstream-run": "file:node_modules/@cycle/xstream-run/lib/index.d.ts",
     "@cycle/rx-run": "file:node_modules/@cycle/rx-run/lib/index.d.ts"
   },
