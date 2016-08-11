@@ -1,20 +1,14 @@
 import Rx from 'rxjs'
 import {run} from '@cycle/rx-run'
 
-function main(source) {
-  const click$ = source.DOM;
+function main(sources) {
+  const mouseover$ = sources.DOM.selectEvents('span', 'mouseover');
   const sinks = {
-    DOM: click$
+    DOM: mouseover$
       .startWith(null)
       .switchMap(() =>
         Rx.Observable.timer(0, 1000)
           .map(i => {
-            /*return {
-              tagName: 'H1',
-              children: [
-                `Second elapsed: ${i}`
-              ]
-            }*/
             return {
               tagName: 'H1',
               children: [
@@ -54,7 +48,13 @@ function DOMDriver(obj$) {
     container.appendChild(element);
   });
 
-  const DOMSource = Rx.Observable.fromEvent(document, 'click');
+  const DOMSource = {
+    selectEvents: function (tagName, eventType) {
+      return Rx.Observable.fromEvent(document, eventType)
+        .filter(ev => ev.target.tagName === tagName.toUpperCase());
+    }
+  };
+
   return DOMSource;
 }
 
