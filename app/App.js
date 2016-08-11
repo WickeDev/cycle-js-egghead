@@ -1,18 +1,11 @@
-import xs from 'xstream';
-import {run} from '@cycle/xstream-run';
-import {makeDOMDriver, h1} from '@cycle/dom';
-import {html} from 'snabbdom-jsx';
+import Rx from 'rxjs'
 
-function main() {
-  return {
-    DOM: xs.periodic(1000).map(i =>
-      <h1>{`${i} seconds elapsed`}</h1>
-    )
-  };
-}
+// Logic (functional)
+Rx.Observable.timer(0, 1000)
+  .map(i => `Seconds elapsed ${i}`)
+  // Effects (imperative)
+  .subscribe(text => {
+    const container = document.querySelector('#app');
+    container.textContent = text;
+  });
 
-const drivers = {
-  DOM: makeDOMDriver('#app')
-};
-
-run(main, drivers);
