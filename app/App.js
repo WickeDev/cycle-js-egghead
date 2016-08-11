@@ -1,6 +1,27 @@
 import Rx from 'rxjs'
 import {run} from '@cycle/rx-run'
 
+function h(tagName, children) {
+  return {
+    tagName: tagName,
+    children: children,
+  };
+}
+
+function h1(children) {
+  return {
+    tagName: 'H1',
+    children: children,
+  };
+}
+
+function span(children) {
+  return {
+    tagName: 'SPAN',
+    children: children,
+  };
+}
+
 function main(sources) {
   const mouseover$ = sources.DOM.selectEvents('span', 'mouseover');
   const sinks = {
@@ -8,19 +29,13 @@ function main(sources) {
       .startWith(null)
       .switchMap(() =>
         Rx.Observable.timer(0, 1000)
-          .map(i => {
-            return {
-              tagName: 'H1',
-              children: [
-                {
-                  tagName: 'SPAN',
-                  children: [
-                    `Seconds elapsed: ${i}`
-                  ]
-                }
-              ]
-            };
-          })
+          .map(i =>
+            h1([
+              span([
+                `Seconds elapsed: ${i}`
+              ])
+            ])
+          )
       ),
     Log: Rx.Observable.timer(0, 2000).map(i => 2 * i),
   };
