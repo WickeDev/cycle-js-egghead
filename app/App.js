@@ -1,34 +1,56 @@
 import Rx from 'rx'
 import {run} from '@cycle/rx-run'
-import {button, p, label, div, makeDOMDriver} from '@cycle/dom'
+import {button, h1, h4, a, div, makeDOMDriver} from '@cycle/dom'
+import {makeHTTPDriver} from '@cycle/http'
+
+// DOM read effect: button clicked
+// HTTP write effect: request sent
+// HTTP read effect: response received
+// DOM write effect: data displayed
 
 function main(sources) {
-  const decrementClick$ = sources.DOM
-    .select('.decrement').events('click');
-  const incrementClick$ = sources.DOM
-    .select('.increment').events('click');
-  const decrementAction$ = decrementClick$.map(ev => -1);
-  const incrementAction$ = incrementClick$.map(ev => +1);
+  const clickEvent$ = sources.DOM
+    .select('.get-first').events('click');
 
-  const number$ = Rx.Observable.of(10)
-    .merge(decrementAction$).merge(incrementAction$)
-    .scan((prev, curr) => prev + curr);
+  const request$ = clickEvent$.map(() => {
+    return {
+      url: 'http://jsonplaceholder.typicode.com/users/1',
+      method: 'GET',
+    };
+  });
+
+  const response$$ = sources.HTTP.response$$
+    .filter(response$ => response$.request.url ===
+    'http://jsonplaceholder.typicode.com/users/1');
+
+  // request$: r
+  // response$$: a, b
+  // ------------r------------------r---------------------
+  //            └----a--          └----b--
+
+  // flatten, switch, mergeAll
+  const response$ = response$$.switch();
+  const firstUser$ = response$.map(response => response.body)
+    .startWith(null);
 
   return {
-    DOM: number$.map(number =>
+    DOM: firstUser$.map(firstUser =>
       div([
-        button('.decrement', 'Decrement'),
-        button('.increment', 'Increment'),
-        p([
-          label(String(number))
+        button('.get-first', 'Get first user'),
+        firstUser === null ? null : div('.user-details', [
+          h1('.user-name', firstUser.name),
+          h4('.user-email', firstUser.email),
+          a('.user-website', {href: firstUser.website}, firstUser.website)
         ])
       ])
-    )
-  }
+    ),
+    HTTP: request$,
+  };
 }
 
 const drivers = {
   DOM: makeDOMDriver('#app'),
+  HTTP: makeHTTPDriver(),
 };
 
 run(main, drivers);

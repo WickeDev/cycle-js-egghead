@@ -2,7 +2,8 @@
   "dependencies": {
     "xstream": "file:node_modules/xstream/core.d.ts",
     "@cycle/xstream-run": "file:node_modules/@cycle/xstream-run/lib/index.d.ts",
-    "@cycle/rx-run": "file:node_modules/@cycle/rx-run/lib/index.d.ts"
+    "@cycle/rx-run": "file:node_modules/@cycle/rx-run/lib/index.d.ts",
+    "@cycle/http": "file:node_modules/@cycle/http/lib/index.d.ts"
   },
   "globalDependencies": {
     "rx": "registry:dt/rx#0.0.0+20160317120654"
